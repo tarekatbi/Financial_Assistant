@@ -26,7 +26,6 @@ def transform_due_date(timestamp_ns):
     date = datetime.utcfromtimestamp(timestamp_s)
     return date.strftime('%Y-%m-%d')
 
-# Formatage des pourcentages
 def format_percentage(percentage):
     return f"{percentage * 100:.0f}%"
 
@@ -64,15 +63,11 @@ def download_image(filename):
 # Analyse Client
 @bp.route('/get_client', methods=['POST'])
 def get_client():
-    """
-    Cette route retourne les informations d'analyse de crédit pour un client,
-    basées sur les filtres fournis dans la requête.
-    """
     try:
         # Lire les données de la requête
         data = request.get_json()
-        customer_name = data.get('customer_name', None)  # Nom du client (facultatif)
-        customer_nbr = data.get('customer_nbr', None)    # Numéro client (facultatif)
+        customer_name = data.get('customer_name', None)
+        customer_nbr = data.get('customer_nbr', None)
 
         # Vérification de la configuration
         wx_utils = current_app.config['WX_UTILS']
@@ -84,7 +79,6 @@ def get_client():
         base_query = 'SELECT * FROM "lakehouse_data"."dso"."fact"'
         filters = []
 
-        # Appliquer les filtres s'ils sont spécifiés
         if customer_name:
             filters.append(f"customer_name = '{customer_name}'")
         if customer_nbr:
@@ -96,21 +90,18 @@ def get_client():
         logging.info(f"Executing query: {base_query}")
         results_df = wx_utils.executeSQL(base_query, fetch_results=True)
 
-        # Vérifier si des résultats existent
         if results_df is None or results_df.empty:
             logging.info("No results found for the given filters")
             return jsonify({"results": []}), 200
 
-        # Utiliser la fonction customized_response pour générer un résumé
         response_text = ""
-        client_details = []  # Liste pour stocker les détails des clients
+        client_details = []
         response_text_last_20 = ""
 
         for _, row in results_df.iterrows():
             response_text += customized_response(row) + "\n"
             response_text_last_20 += customized_response_last_20_percent(row) + "\n"
 
-            # Ajouter les détails des clients à la liste
             client_details.append({
                 "customer_name": row['customer_name'],
                 "customer_nbr": row['customer_nbr'],
@@ -125,14 +116,11 @@ def get_client():
                 "segmentation": row['seg']
             })
 
-        # Créer un fichier Excel avec les résultats
         filename = f"client_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
         save_to_excel(results_df, filename)
 
-        # Retourner le lien de téléchargement
         download_link = f"https://financialchatbot.1orl4io77158.eu-de.codeengine.appdomain.cloud/api/v1/download/{filename}"
 
-        # Retourner les résultats sous forme JSON, les détails des clients, et le résumé
         return jsonify({
             "response": response_text,
             "response_last20":response_text_last_20,
@@ -176,23 +164,16 @@ def format_payment_statement_grouped(transaction_details):
 
 @bp.route('/get_payment_statement', methods=['POST'])
 def get_payment_statement():
-    """
-    Cette route retourne l'historique des paiements (montants des transactions) pour un client donné,
-    en récupérant les informations des tables 'fact' et 'open_ar'.
-    """
     try:
-        # Lire les données de la requête
         data = request.get_json()
-        customer_name = data.get('customer_name', None)  # Nom du client (facultatif)
-        customer_nbr = data.get('customer_nbr', None)    # Numéro client (facultatif)
+        customer_name = data.get('customer_name', None)  
+        customer_nbr = data.get('customer_nbr', None)    
 
-        # Vérification de la configuration
         wx_utils = current_app.config['WX_UTILS']
         if not wx_utils.validate_config():
             logging.error("Invalid configuration")
             return jsonify({"error": "Invalid configuration"}), 500
 
-        # Construire la requête SQL pour récupérer les montants facturés et dus du client
         base_query = """
             SELECT
                 f."customer_name",
@@ -210,7 +191,6 @@ def get_payment_statement():
         """
         filters = []
 
-        # Appliquer les filtres s'ils sont spécifiés
         if customer_name:
             filters.append(f"f.customer_name = '{customer_name}'")
         if customer_nbr:
@@ -222,19 +202,15 @@ def get_payment_statement():
         logging.info(f"Executing query: {base_query}")
         results_df = wx_utils.executeSQL(base_query, fetch_results=True)
 
-        # Créer un fichier Excel avec les résultats
         filename = f"payment_statement{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
         save_to_excel(results_df, filename)
 
-        # Retourner le lien de téléchargement
         download_link = f"https://financialchatbot.1orl4io77158.eu-de.codeengine.appdomain.cloud/api/v1/download/{filename}"
 
-        # Vérifier si des résultats existent
         if results_df is None or results_df.empty:
             logging.info("No results found for the given filters")
             return jsonify({"results": []}), 200
 
-        # Extraction des montants des transactions
         transaction_details = []
         for _, row in results_df.iterrows():
             transaction = {
@@ -268,7 +244,7 @@ def get_payment_statement():
 def get_invoice_status():
     try:
         data = request.get_json()
-        invoice_number = data.get('Invoice #', None)  # Numéro de la facture (obligatoire)
+        invoice_number = data.get('Invoice #', None)
 
         if not invoice_number:
             return jsonify({"error": "Invoice number is required"}), 400
@@ -295,12 +271,10 @@ def get_invoice_status():
         logging.info(f"Executing query: {base_query}")
         results_df = wx_utils.executeSQL(base_query, fetch_results=True)
 
-        # Vérifier si des résultats existent
         if results_df is None or results_df.empty:
             logging.info(f"No results found for invoice number: {invoice_number}")
             return jsonify({"error": f"No results found for invoice {invoice_number}"}), 404
 
-        # Créer un dictionnaire avec les informations de la facture
         transaction_details = []
         for _, row in results_df.iterrows():
             transaction = {
@@ -311,11 +285,10 @@ def get_invoice_status():
                 "due_date": transform_due_date(row['due_date']),
                 "amount_invoiced": format_amount(row['amount_invoiced']),
                 "last_remark": row['last_remark'],
-                "type": row['type'],  # Assuming there is a status field indicating if the invoice is paid or overdue
+                "type": row['type'],
             }
             transaction_details.append(transaction)
 
-        # Construire la réponse
         payment_statement = ""
         for transaction in transaction_details:
             payment_statement += (
@@ -325,7 +298,6 @@ def get_invoice_status():
                 f"Le montant total facturé est de {transaction['amount_invoiced']}.\n"
                 f"Cette facture est de type {transaction['type']}, et la dernière remarque à son sujet est : '{transaction['last_remark']}'.\n\n"
             )
-        # Retourner les résultats sous forme JSON
         return jsonify({
             "payment_statement": payment_statement
         }), 200
@@ -340,24 +312,21 @@ def get_invoice_status():
 @bp.route('/generate_follow_up_email', methods=['POST'])
 def generate_follow_up_email():
     try:
-        # Récupérer les données de la requête JSON
         data = request.json
         logging.info(f"Requête reçue: {data}")
         
-        # Vérifiez si les clés nécessaires sont présentes dans les données
         required_keys = ['customer_name', 'invoice_number', 'invoice_date', 'due_date', 'amount_due']
         if not all(key in data for key in required_keys):
             logging.error(f"Données manquantes dans la requête. Clés attendues: {required_keys}")
             return jsonify({'error': 'Données manquantes dans la requête'}), 400
         
-        # Extraire les données de la requête
         client = data['customer_name']
         invoice_number = data['invoice_number']
         invoice_date = data['invoice_date']
         due_date = data['due_date']
         amount_due = data['amount_due']
 
-        # Formatage de l'input pour le modèle
+        # Prompt
         input_text = f"""
         Génère uniquement le contenu d'un e-mail de relance pour la facture suivante :
 
@@ -370,7 +339,6 @@ def generate_follow_up_email():
         L'email doit être professionnel, courtois et rappeler l'importance du paiement rapide. Ne rends rien d'autre que le texte de l'e-mail.
         """
 
-        # Paramètres du modèle
         model_id = "meta-llama/llama-3-405b-instruct"
         parameters = {
             "decoding_method": "greedy",
@@ -380,11 +348,9 @@ def generate_follow_up_email():
             "max_new_tokens": 300
         }
 
-        # Appeler la fonction pour générer l'email via Watsonx
         wx_ai =  current_app.config['WXAI']
         result = wx_ai.generate_ga_batch(input_text, model_id, parameters)
         
-        # Vérifier si la réponse contient les résultats attendus
         if 'results' in result:
             email_content = result['results'][0]
             logging.info(f"Email généré : {email_content}")
@@ -403,14 +369,13 @@ def generate_follow_up_email():
 def get_collector():
     try:
         data = request.get_json()
-        invoice_number = data.get('Invoice #', None)  # Numéro de la facture (obligatoire)
-        customer_name = data.get('customer_name', None)  # Nom du client (facultatif)
-        customer_nbr = data.get('customer_nbr', None)    # Numéro client (facultatif)
+        invoice_number = data.get('Invoice #', None)
+        customer_name = data.get('customer_name', None)  
+        customer_nbr = data.get('customer_nbr', None)    
 
         if not invoice_number:
             return jsonify({"error": "Invoice number is required"}), 400
 
-        # Vérification de la configuration
         wx_utils = current_app.config['WX_UTILS']
         if not wx_utils.validate_config():
             logging.error("Invalid configuration")
@@ -428,12 +393,10 @@ def get_collector():
         logging.info(f"Executing query: {base_query}")
         results_df = wx_utils.executeSQL(base_query, fetch_results=True)
 
-        # Vérifier si des résultats existent
         if results_df is None or results_df.empty:
             logging.info(f"No results found for invoice number: {invoice_number}")
             return jsonify({"error": f"No results found for invoice {invoice_number}"}), 404
 
-        # Créer un dictionnaire avec les informations de la facture
         transaction_details = []
         for _, row in results_df.iterrows():
             transaction = {
@@ -444,7 +407,6 @@ def get_collector():
             }
             transaction_details.append(transaction)
 
-        # Construire la réponse
         payment_statement = ""
         for transaction in transaction_details:
             payment_statement += (
@@ -452,7 +414,6 @@ def get_collector():
                 f"la facture a été émise pour l'entité {transaction['entity_name']} du Groupe {transaction['customer_name']}.\n"
                 f"le collecteur en charge de cette facture est {transaction['collector']}\n"
             )
-        # Retourner les résultats sous forme JSON
         return jsonify({
             "payment_statement": payment_statement
         }), 200
