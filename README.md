@@ -72,21 +72,21 @@ Les données utilisées sont confidentielles et ont été anonymisées.
 
 ---
 
-## 📌 $$Utilisation**
+## 📌 **Utilisation**
 
 1. Clonez ce dépôt :
-'''bash
+```bash
 git clone https://github.com/username/assistant-financier.git
 cd assistant-financier
-'''
+```
 
 2. Exécutez le script pour lancer le serveur en interne:
-'''bash
+```bash
 ./install_local_standalone.sh
 ./run_local_standalone.sh
-'''
+```
 
 3. Exécutez le script pour lancer le serveur en Docker:
-'''bash
+```bash
 ./run_local_container.sh
-'''
+```
