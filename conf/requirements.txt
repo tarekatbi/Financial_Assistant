@@ -1,0 +1,12 @@
+Flask
+flask_cors
+presto-python-client==0.8.4
+SQLAlchemy
+pyhive
+pyyaml
+unidecode
+pandas
+APIFlask
+openpyxl
+ibm_cloud_sdk_core
+ratelimit

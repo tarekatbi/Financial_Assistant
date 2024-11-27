@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+
+
+  prestodatafetch:
+    container_name: prestodatafetch
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    networks:
+      - prestodatafetch-network
+    ports:
+      - target: 3333
+        published: 8000
+        protocol: tcp
+        mode: host     
+#    env_file:
+#      - "./conf/template.env"
+#      - "./conf/real.env"   
+#    volumes:
+#      - app_storage:/home/prestodatafetch/ #/mnt/container/volumes/prestodatafetch:/home/prestodatafetch/
+    #command:   python src/main_rest_entrypoint.py
+
+
+#volumes:
+#  app_storage:
+#    driver: local # Define the driver and options under the volume name
+#    driver_opts:
+##      type: none
+#      device: /mnt/container/volumes/prestodatafetch
+#      o: bind
+
+networks:
+  prestodatafetch-network:
+    driver: bridge    

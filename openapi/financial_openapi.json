@@ -1,0 +1,488 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Financial Chatbot",
+      "version": "1.0.0",
+      "description": "API for a Financial Assistant"
+    },
+    "servers": [
+      {
+        "url": "figure_it_out",
+        "description": "Flask API Point"
+      }
+    ],
+    "paths": {
+      "/get_client": {
+        "post": {
+          "summary": "Get client details",
+          "description": "Retrieve client details based on customer name and number",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer_name": {
+                      "type": "string"
+                    },
+                    "customer_nbr": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["customer_name", "customer_nbr"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "client_details": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "%_ontime_in_last_20%": {
+                              "type": "number",
+                              "format": "float"
+                            },
+                            "%_overdue_in_last_20%": {
+                              "type": "number",
+                              "format": "float"
+                            },
+                            "amount_invoiced": {
+                              "type": "string"
+                            },
+                            "amount_overdue": {
+                              "type": "string"
+                            },
+                            "avg_contract_payment_term": {
+                              "type": "number",
+                              "format": "float"
+                            },
+                            "avg_on_time_payment_delay": {
+                              "type": "number",
+                              "format": "float"
+                            },
+                            "avg_overdue_payment_delay": {
+                              "type": "number",
+                              "format": "float"
+                            },
+                            "customer_name": {
+                              "type": "string"
+                            },
+                            "customer_nbr": {
+                              "type": "string"
+                            },
+                            "score_retard": {
+                              "type": "number",
+                              "format": "float"
+                            },
+                            "segmentation": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "download_link": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "response": {
+                        "type": "string"
+                      },
+                      "response_last20": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/get_payment_statement": {
+      "post": {
+        "summary": "Get payment statement for a client",
+        "description": "Retrieve payment statement and transaction details based on customer name and number",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_name": {
+                    "type": "string"
+                  },
+                  "customer_nbr": {
+                    "type": "string"
+                  }
+                },
+                "required": ["customer_name", "customer_nbr"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "download_link": {
+                      "type": "string"
+                    },
+                    "payment_statement": {
+                      "type": "string"
+                    },
+                    "transaction_details": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "amount_due": {
+                            "type": "string"
+                          },
+                          "amount_invoiced": {
+                            "type": "string"
+                          },
+                          "amount_overdue": {
+                            "type": "string"
+                          },
+                          "amount_paid": {
+                            "type": "string"
+                          },
+                          "customer_name": {
+                            "type": "string"
+                          },
+                          "due_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "entity_name": {
+                            "type": "string"
+                          },
+                          "invoice_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "invoice_number": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } 
+    }
+    },
+    "/get_invoice_status": {
+      "post": {
+        "summary": "Get invoice status",
+        "description": "Retrieve the payment statement for a specific invoice by its number",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Invoice #": {
+                    "type": "string"
+                  }
+                },
+                "required": ["Invoice #"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "payment_statement": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate_follow_up_email": {
+      "post": {
+        "summary": "Generate follow-up email",
+        "description": "Generate a personalized follow-up email for an overdue invoice",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_name": {
+                    "type": "string"
+                  },
+                  "invoice_number": {
+                    "type": "string"
+                  },
+                  "invoice_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "amount_due": {
+                    "type": "string"
+                  }
+                },
+                "required": ["customer_name", "invoice_number", "invoice_date", "due_date", "amount_due"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email_content": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get_collector": {
+      "post": {
+        "summary": "Get invoice collector",
+        "description": "Retrieve the collector responsible for a specific invoice",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_name": {
+                    "type": "string"
+                  },
+                  "customer_nbr": {
+                    "type": "string"
+                  },
+                  "Invoice #": {
+                    "type": "string"
+                  }
+                },
+                "required": ["customer_name", "customer_nbr", "Invoice #"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "payment_statement": {
+                      "type": "string",
+                      "example": "Concernant la facture #0026638\nla facture a été émise pour l'entité CUST_6843 du Groupe Client_692.\nle collecteur en charge de cette facture est France Unassigned\n"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    },
+    "components": {
+      "schemas": {}
+    }
+}
+  

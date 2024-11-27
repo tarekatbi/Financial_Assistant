@@ -1,0 +1,12 @@
+all_configs:
+- config:
+    WXDATA_CATALOG: think_about_it
+    WXDATA_HOST: think_about_it
+    WXDATA_ICEBERG_CATALOG: think_about_it
+    WXDATA_LANDING_SCHEMA: think_about_it
+    WXDATA_PASSWORD: think_about_it
+    WXDATA_PORT: 443
+    WXDATA_USER: think_about_it
+    WXAI_INFER_ENDPOINT: think_about_it
+    WXAI_PROJECT_ID: think_about_it
+    WXAI_ACCESS_KEY: got_you
